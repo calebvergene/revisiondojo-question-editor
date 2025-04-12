@@ -3,13 +3,13 @@ import { useState } from "react";
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 
 
@@ -45,6 +45,14 @@ const QuestionModal = () => {
                                 onChange={handleMessageChange}
                             />
                         </div>
+                        <Tabs defaultValue="account" className="mt-6">
+                            <TabsList>
+                                <TabsTrigger value="account">MCQ</TabsTrigger>
+                                <TabsTrigger value="password">Long Answer</TabsTrigger>
+                            </TabsList>
+                            <TabsContent value="account">Make changes to your account here.</TabsContent>
+                            <TabsContent value="password">Change your password here.</TabsContent>
+                        </Tabs>
                     </form>
                 </DialogHeader>
             </DialogContent>
