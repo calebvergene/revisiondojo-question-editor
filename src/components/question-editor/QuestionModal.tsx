@@ -11,6 +11,7 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Option, Part } from "@/types/index";
+import MCQ from "../MCQ/MCQ";
 
 
 
@@ -66,14 +67,14 @@ const QuestionModal = () => {
             }))
         });
     };
-    // need to make function to drag options to change order
+    // !need to make function to drag options to change order
 
     return (
         <Dialog>
             <DialogTrigger>Open</DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle className="!text-2xl">Create a Question</DialogTitle>
+                    <DialogTitle className="!text-2xl !font-extrabold">Create a Question</DialogTitle>
                     <form onSubmit={() => console.log('eventually...')}>
                         <div className="grid w-full gap-1.5 mt-3">
                             <Textarea
@@ -81,14 +82,15 @@ const QuestionModal = () => {
                                 id="message"
                                 value={specification}
                                 onChange={handleMessageChange}
+                                className="!font-sans"
                             />
                         </div>
                         <Tabs defaultValue="mcq" className="mt-6">
                             <TabsList>
-                                <TabsTrigger value="mcq"><CheckSquare /> MCQ</TabsTrigger>
-                                <TabsTrigger value="long answer"><AlignLeft /> Long Answer</TabsTrigger>
+                                <TabsTrigger value="mcq" className="!font-bold"><CheckSquare /> MCQ</TabsTrigger>
+                                <TabsTrigger value="long answer" className="!font-bold"><AlignLeft /> Long Answer</TabsTrigger>
                             </TabsList>
-                            <TabsContent value="mcq">mcq</TabsContent>
+                            <TabsContent value="mcq" ><MCQ addOption={addOption} updateOption={updateOption} removeOption={removeOption} question={question} /></TabsContent>
                             <TabsContent value="long answer">long answer</TabsContent>
                         </Tabs>
                     </form>
