@@ -61,6 +61,7 @@ const QuestionModal = ({ question, setQuestion }: Props) => {
     };
 
     // flexible function to update option
+    // eslint-disable-next-line
     const updateOption = (id: number, field: keyof Option, value: any): void => {
         setQuestion({
             ...question,

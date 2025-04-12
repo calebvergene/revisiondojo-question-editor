@@ -6,6 +6,7 @@ import OptionSelection from './OptionSelection'
 interface Props {
     addOption: () => void
     removeOption: (id: number) => void
+    // eslint-disable-next-line
     updateOption: (id: number, field: keyof Option, value: any) => void
     question: Question
 }
@@ -34,7 +35,7 @@ const MCQ = ({ addOption, removeOption, updateOption, question }: Props) => {
 
             {question.options.length === 0 ? (
                 <div className="text-center p-4 border border-dashed border-gray-300 rounded-xl">
-                    <p className="text-gray-500">No options added yet. Click "Add Option" to create a multiple-choice option.</p>
+                    <p className="text-gray-500">No options added yet. Click &quot;Add Option&quot; to create a multiple-choice option.</p>
                 </div>
             ) : (
                 <div className="space-y-4 mt-3 mb-1.5">

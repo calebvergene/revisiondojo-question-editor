@@ -7,6 +7,7 @@ import { Textarea } from '../ui/textarea'
 
 interface Props {
   removeOption: (id: number) => void
+  // eslint-disable-next-line
   updateOption: (id: number, field: keyof Option, value: any) => void
   option: Option
 }
