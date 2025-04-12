@@ -1,6 +1,6 @@
 "use client"
 import { useState } from "react";
-import { CheckSquare, AlignLeft } from 'lucide-react';
+import { CheckSquare, AlignLeft, Plus } from 'lucide-react';
 import {
     Dialog,
     DialogContent,
@@ -13,24 +13,35 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Option, Part } from "@/types/index";
 import MCQ from "../MCQ/MCQ";
 
+interface Props {
+    question: {
+        id: string;
+        specification: string;
+        options: Option[];
+        parts: Part[];
+    };
+    setQuestion: React.Dispatch<React.SetStateAction<{
+        id: string;
+        specification: string;
+        options: Option[];
+        parts: Part[];
+    }>>;
+}
 
-
-const QuestionModal = () => {
-    const [question, setQuestion] = useState({
-        id: crypto.randomUUID(),
-        specification: '',
-        options: [] as Option[],
-        parts: [] as Part[]
-    });
+const QuestionModal = ({ question, setQuestion }: Props) => {
 
     // generates IDs for options and parts
     const generateId = (): number => Math.floor(Math.random() * 100000);
 
 
-    // For specification
+    // For specification (temporary, need a save question button at the end)
     const [specification, setSpecification] = useState("");
     const handleMessageChange = (e: { target: { value: string; }; }) => {
         setSpecification(e.target.value);
+        setQuestion({
+            ...question,
+            specification: specification
+        })
     };
 
 
@@ -49,6 +60,7 @@ const QuestionModal = () => {
         });
     };
 
+    // flexible function to update option
     const updateOption = (id: number, field: keyof Option, value: any): void => {
         setQuestion({
             ...question,
@@ -71,7 +83,10 @@ const QuestionModal = () => {
 
     return (
         <Dialog>
-            <DialogTrigger>Open</DialogTrigger>
+            <DialogTrigger className="flex items-center space-x-1 px-3 py-1.5 font-bold bg-[#0084c7] text-white rounded-2xl hover:bg-[#0084c7]/90 duration-100 cursor-pointer">
+                <Plus size={16} />
+                <span>Create Question</span>
+            </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle className="!text-2xl !font-extrabold">Create a Question</DialogTitle>
@@ -82,7 +97,7 @@ const QuestionModal = () => {
                                 id="message"
                                 value={specification}
                                 onChange={handleMessageChange}
-                                className="!font-sans"
+                                className="!font-sans !min-h-20"
                             />
                         </div>
                         <Tabs defaultValue="mcq" className="mt-6">
@@ -94,6 +109,11 @@ const QuestionModal = () => {
                             <TabsContent value="long answer">long answer</TabsContent>
                         </Tabs>
                     </form>
+                    <div className="w-full flex justify-end">
+                        <button className=" mt-1 items-center space-x-1 px-3 py-1.5 font-bold bg-[#0084c7] text-white rounded-2xl hover:bg-[#0084c7]/90 duration-100 cursor-pointer">
+                            <span>Save Question</span>
+                        </button>
+                    </div>
                 </DialogHeader>
             </DialogContent>
         </Dialog>

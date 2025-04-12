@@ -1,42 +1,50 @@
 import React from 'react'
 import { Option, Question } from '@/types/index'
+import { Plus } from 'lucide-react'
+import OptionSelection from './OptionSelection'
 
-interface props {
+interface Props {
     addOption: () => void
     removeOption: (id: number) => void
     updateOption: (id: number, field: keyof Option, value: any) => void
     question: Question
 }
 
-const MCQ = ({ addOption, removeOption, updateOption, question }: props) => {
-    // prevent default behavior that might cause refresh
+const MCQ = ({ addOption, removeOption, updateOption, question }: Props) => {
+    // prevent refresh
     const handleAddOption = (e: React.MouseEvent) => {
         e.preventDefault();
         addOption();
     };
 
     return (
-        <div className="p-5 border mt-1 rounded-xl">
+        <div className="px-5 py-3 border mt-1 rounded-xl h-full overflow-y-scroll">
+
             <div className="flex justify-between items-center mb-2">
-                <h2 className="text-lg font-semibold text-gray-800">Options</h2>
+                <h2 className="text-lg font-extrabold">Answer Choices</h2>
                 <button
                     onClick={handleAddOption}
-                    type="button" // Explicitly set type to "button" to prevent form submission
-                    className="flex items-center space-x-1 px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+                    type="button"
+                    className="flex items-center space-x-1 px-3 py-1.5 font-bold bg-neutral-100 text-neutral-500 rounded-2xl hover:bg-neutral-200 duration-100 cursor-pointer"
                 >
+                    <Plus size={16} />
                     <span>Add Option</span>
                 </button>
             </div>
+
             {question.options.length === 0 ? (
                 <div className="text-center p-4 border border-dashed border-gray-300 rounded-xl">
                     <p className="text-gray-500">No options added yet. Click "Add Option" to create a multiple-choice option.</p>
                 </div>
             ) : (
-                <div className="space-y-4">
+                <div className="space-y-4 mt-3 mb-1.5">
                     {question.options.map((option) => (
-                        <div key={option.id} className="flex items-center space-x-4 p-4 border rounded-xl">
-                            <div>{option.id}</div>
-                        </div>
+                        <OptionSelection
+                            key={option.id}
+                            removeOption={removeOption}
+                            updateOption={updateOption}
+                            option={option}
+                        />
                     ))}
                 </div>
             )}
