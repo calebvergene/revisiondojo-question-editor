@@ -9,9 +9,11 @@ interface Props {
     // eslint-disable-next-line
     updateOption: (id: number, field: keyof Option, value: any) => void
     question: Question
+    setImages: React.Dispatch<React.SetStateAction<string[]>>
+    images: string[]
 }
 
-const MCQ = ({ addOption, removeOption, updateOption, question }: Props) => {
+const MCQ = ({ addOption, removeOption, updateOption, question, setImages, images }: Props) => {
     // prevent refresh
     const handleAddOption = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -45,6 +47,8 @@ const MCQ = ({ addOption, removeOption, updateOption, question }: Props) => {
                             removeOption={removeOption}
                             updateOption={updateOption}
                             option={option}
+                            setImages={setImages}
+                            images={images}
                         />
                     ))}
                 </div>

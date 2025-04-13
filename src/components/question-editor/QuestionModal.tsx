@@ -8,7 +8,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import { Textarea } from "@/components/ui/textarea/textarea"
+import { Textarea } from "@/components/Textarea/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Option, Part } from "@/types/index";
 import MCQ from "../MCQ/MCQ";
@@ -30,6 +30,8 @@ interface Props {
 }
 
 const QuestionModal = ({ question, setQuestion }: Props) => {
+    // will be a list of images in markdown
+    const [images, setImages] = useState<string[]>([]);
 
     // generates IDs for options and parts
     const generateId = (): number => Math.floor(Math.random() * 100000);
@@ -119,6 +121,9 @@ const QuestionModal = ({ question, setQuestion }: Props) => {
     };
 
 
+    // for images
+
+
     return (
         <Dialog>
             <DialogTrigger className="flex items-center space-x-1 px-3 py-1.5 font-bold bg-[#0084c7] text-white rounded-2xl hover:bg-[#0084c7]/90 duration-100 cursor-pointer">
@@ -137,6 +142,8 @@ const QuestionModal = ({ question, setQuestion }: Props) => {
                                 id="message"
                                 value={question.specification}
                                 onChange={handleMessageChange}
+                                setImages={setImages}
+                                images={images}
                                 className="!font-sans !min-h-20"
                             />
                         </div>
@@ -145,7 +152,7 @@ const QuestionModal = ({ question, setQuestion }: Props) => {
                                 <TabsTrigger value="mcq" className="!font-bold"><CheckSquare /> MCQ</TabsTrigger>
                                 <TabsTrigger value="long answer" className="!font-bold"><AlignLeft /> Long Answer</TabsTrigger>
                             </TabsList>
-                            <TabsContent value="mcq" ><MCQ addOption={addOption} updateOption={updateOption} removeOption={removeOption} question={question} /></TabsContent>
+                            <TabsContent value="mcq" ><MCQ addOption={addOption} updateOption={updateOption} removeOption={removeOption} question={question} setImages={setImages} images={images} /></TabsContent>
                             <TabsContent value="long answer"><LongAnswer addPart={addPart} updatePart={updatePart} removePart={removePart} question={question} /></TabsContent>
                         </Tabs>
                     </div>
