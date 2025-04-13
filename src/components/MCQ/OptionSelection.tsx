@@ -1,9 +1,9 @@
 import React from 'react'
 import { Option } from '@/types'
-import { Trash2 } from 'lucide-react'
+import { Trash2, ChevronsUpDown, ImagePlus } from 'lucide-react'
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from '../ui/label'
-import { Textarea } from '../ui/textarea'
+import { Textarea } from '../ui/textarea/textarea'
 
 interface Props {
   removeOption: (id: number) => void
@@ -32,11 +32,17 @@ const OptionSelection = ({ removeOption, updateOption, option }: Props) => {
           </div>
         </div>
         <div>
+          <button className='p-1 text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100 rounded-xl duration-200 cursor-pointer'>
+            <ImagePlus size={16} />
+          </button>
           <button
             onClick={() => removeOption(option.id)}
-            className="p-1 text-neutral-500 hover:text-neutral-700 cursor-pointer"
+            className="p-1 text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100 rounded-xl duration-200 cursor-pointer"
           >
             <Trash2 size={16} />
+          </button>
+          <button className='p-1 text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100 rounded-xl duration-200 cursor-move'>
+            <ChevronsUpDown size={16} />
           </button>
         </div>
       </div>
