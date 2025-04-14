@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 
 export default function Home() {
   const [question, setQuestion] = useState({
-    id: crypto.randomUUID(),
+    id: "test", //crypto.randomUUID(),
     specification: '',
     options: [] as Option[],
     parts: [] as Part[]

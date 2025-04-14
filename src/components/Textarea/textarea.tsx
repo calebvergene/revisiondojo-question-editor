@@ -1,6 +1,10 @@
-import * as React from "react"
+"use client"
+
 import { cn } from "@/lib/utils"
 import TextAreaToolbar from "./Toolbar"
+import { useEffect, useState } from "react"
+import React from "react"
+import ImageRender from "./ImageRender"
 
 interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   className?: string
@@ -10,8 +14,11 @@ interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement
 
 function Textarea({ className, setImages, images, ...props }: TextareaProps) {
   const textareaRef = React.useRef<HTMLTextAreaElement>(null)
+  const [imagePreviewUrl, setImagePreviewUrl] = useState('');
 
-  React.useEffect(() => {
+
+  // this automatically adjusts height of the text box when it overflows
+  useEffect(() => {
     const adjustHeight = () => {
       const textarea = textareaRef.current
       if (textarea) {
@@ -19,18 +26,16 @@ function Textarea({ className, setImages, images, ...props }: TextareaProps) {
         textarea.style.height = `${textarea.scrollHeight}px`
       }
     }
-
     adjustHeight()
-
     const textarea = textareaRef.current
     if (textarea) {
       textarea.addEventListener('input', adjustHeight)
-
       return () => {
         textarea.removeEventListener('input', adjustHeight)
       }
     }
   }, [])
+  
 
   return (
     <div>
@@ -43,7 +48,10 @@ function Textarea({ className, setImages, images, ...props }: TextareaProps) {
         )}
         {...props}
       />
-      <TextAreaToolbar setImages={setImages}/>
+      <TextAreaToolbar setImages={setImages} setImagePreviewUrl={setImagePreviewUrl} />
+      <ImageRender
+        imagePreviewUrl={imagePreviewUrl}
+      />
     </div>
   )
 }

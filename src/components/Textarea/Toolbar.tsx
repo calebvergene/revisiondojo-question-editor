@@ -4,12 +4,12 @@ import React, { useState, ChangeEvent } from 'react'
 
 interface Props {
   setImages: React.Dispatch<React.SetStateAction<string[]>>;
+  setImagePreviewUrl: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const TextAreaToolbar = ({ setImages }: Props) => {
-  const [imagePreviewUrl, setImagePreviewUrl] = useState('');
+const TextAreaToolbar = ({ setImages, setImagePreviewUrl }: Props) => {
 
-  // handle image upload
+  // handles image uploading
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     const reader = new FileReader();
@@ -18,7 +18,7 @@ const TextAreaToolbar = ({ setImages }: Props) => {
       reader.onloadend = () => {
         const result = reader.result as string;
         setImagePreviewUrl(result);
-        setImages(prev => [...prev, result]);
+        setImages(prev => [...prev, result as string]);
         console.log(result);
       };
 
