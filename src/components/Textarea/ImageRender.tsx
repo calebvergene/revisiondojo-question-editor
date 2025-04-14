@@ -1,123 +1,81 @@
+import type { Image } from '@/types';
 import React, { useEffect, useState, useRef } from 'react';
 
 interface Props {
-    imagePreviewUrl: string;
+    image: Image;
+    updateImage: (updatedImage: Image) => void;
 }
 
-type Corner = 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight' | null;
+type Handle = 'left' | 'right' | null;
 
-const ImageRender: React.FC<Props> = ({ imagePreviewUrl }) => {
-    const [width, setWidth] = useState<number>(400);
+const ImageRender: React.FC<Props> = ({ image, updateImage }: Props) => {
+    const [width, setWidth] = useState<number>(300);
     const [height, setHeight] = useState<number>(300);
-    const [markdown, setMarkdown] = useState<string>('');
     const [isDragging, setIsDragging] = useState<boolean>(false);
-    const [activeCorner, setActiveCorner] = useState<Corner>(null);
+    const [isHovering, setIsHovering] = useState<boolean>(false);
+    const [activeHandle, setActiveHandle] = useState<Handle>(null);
     const [aspectRatio, setAspectRatio] = useState<number>(1);
-    const [lockAspectRatio, setLockAspectRatio] = useState<boolean>(true);
 
-    // Using MutableRefObject instead of RefObject for proper typing
     const imageRef = useRef<HTMLImageElement | null>(null);
-    const topLeftRef = useRef<HTMLDivElement | null>(null);
-    const topRightRef = useRef<HTMLDivElement | null>(null);
-    const bottomLeftRef = useRef<HTMLDivElement | null>(null);
-    const bottomRightRef = useRef<HTMLDivElement | null>(null);
+    const leftHandleRef = useRef<HTMLDivElement | null>(null);
+    const rightHandleRef = useRef<HTMLDivElement | null>(null);
 
+    // this just updates the images width and height each time the image is resized
     useEffect(() => {
-        if (imagePreviewUrl) {
-            generateMarkdown();
+        if (image) {
+            updateImage({id: image.id, url: image.url, markdown:"", width: width, height: height});
         }
-    }, [imagePreviewUrl, width, height]);
+    }, [image.url, width, height]);
 
-    const generateMarkdown = (): void => {
-        // standard Markdown image syntax
-        let imgMarkdown = `![](${imagePreviewUrl})`;
-        setMarkdown(imgMarkdown);
-    };
-
-    // Load image and set aspect ratio
+    // load image and set aspect ratio
     useEffect(() => {
-        if (imagePreviewUrl) {
+        if (image) {
             const img = new Image();
             img.onload = () => {
                 const ratio = img.width / img.height;
                 setAspectRatio(ratio);
 
-                // Set initial dimensions if not already set
                 if (!width || !height) {
                     setWidth(img.width);
                     setHeight(img.height);
                 }
             };
-            img.src = imagePreviewUrl;
+            img.src = image.url;
         }
-    }, [imagePreviewUrl]);
+    }, [image.url]);
 
-    // Set up resize event listeners
+    // resize event listeners
     useEffect(() => {
-        const handleResize = (corner: Corner) => (e: MouseEvent) => {
+        const handleResize = (handle: Handle) => (e: MouseEvent) => {
             e.preventDefault();
             e.stopPropagation();
 
             const startX = e.clientX;
-            const startY = e.clientY;
             const startWidth = width;
-            const startHeight = height;
+            const imageElement = imageRef.current;
+            const imageRect = imageElement?.getBoundingClientRect();
+            const imageLeft = imageRect ? imageRect.left : 0;
 
             setIsDragging(true);
-            setActiveCorner(corner);
+            setActiveHandle(handle);
 
             const onMouseMove = (moveEvent: MouseEvent) => {
-                let deltaX: number, deltaY: number, newWidth: number, newHeight: number;
+                let deltaX: number, newWidth: number;
 
-                switch (corner) {
-                    case 'topLeft':
-                        deltaX = startX - moveEvent.clientX;
-                        deltaY = startY - moveEvent.clientY;
-                        newWidth = Math.max(50, startWidth + deltaX);
+                if (handle === 'left') {
+                    deltaX = startX - moveEvent.clientX;
+                    newWidth = Math.max(50, startWidth + deltaX);
+                } else { // right handle
+                    deltaX = moveEvent.clientX - startX;
+                    newWidth = Math.max(50, startWidth + deltaX);
+                }
 
-                        if (lockAspectRatio) {
-                            newHeight = Math.round(newWidth / aspectRatio);
-                        } else {
-                            newHeight = Math.max(50, startHeight + deltaY);
-                        }
-                        break;
-
-                    case 'topRight':
-                        deltaX = moveEvent.clientX - startX;
-                        deltaY = startY - moveEvent.clientY;
-                        newWidth = Math.max(50, startWidth + deltaX);
-
-                        if (lockAspectRatio) {
-                            newHeight = Math.round(newWidth / aspectRatio);
-                        } else {
-                            newHeight = Math.max(50, startHeight + deltaY);
-                        }
-                        break;
-
-                    case 'bottomLeft':
-                        deltaX = startX - moveEvent.clientX;
-                        deltaY = moveEvent.clientY - startY;
-                        newWidth = Math.max(50, startWidth + deltaX);
-
-                        if (lockAspectRatio) {
-                            newHeight = Math.round(newWidth / aspectRatio);
-                        } else {
-                            newHeight = Math.max(50, startHeight + deltaY);
-                        }
-                        break;
-
-                    case 'bottomRight':
-                    default:
-                        deltaX = moveEvent.clientX - startX;
-                        deltaY = moveEvent.clientY - startY;
-                        newWidth = Math.max(50, startWidth + deltaX);
-
-                        if (lockAspectRatio) {
-                            newHeight = Math.round(newWidth / aspectRatio);
-                        } else {
-                            newHeight = Math.max(50, startHeight + deltaY);
-                        }
-                        break;
+                let newHeight = Math.round(newWidth / aspectRatio);
+                
+                // height doesn't go below 50px so not smaller than bars on the side
+                if (newHeight < 50) {
+                    newHeight = 50;
+                    newWidth = Math.round(newHeight * aspectRatio);
                 }
 
                 setWidth(newWidth);
@@ -126,7 +84,7 @@ const ImageRender: React.FC<Props> = ({ imagePreviewUrl }) => {
 
             const onMouseUp = () => {
                 setIsDragging(false);
-                setActiveCorner(null);
+                setActiveHandle(null);
                 document.removeEventListener('mousemove', onMouseMove);
                 document.removeEventListener('mouseup', onMouseUp);
             };
@@ -135,90 +93,64 @@ const ImageRender: React.FC<Props> = ({ imagePreviewUrl }) => {
             document.addEventListener('mouseup', onMouseUp);
         };
 
-        // Add event listeners to all four corners
-        const addResizeListener = (ref: React.RefObject<HTMLDivElement | null>, corner: Corner) => {
+        // add event listeners to both side handles
+        const addResizeListener = (ref: React.RefObject<HTMLDivElement | null>, handle: Handle) => {
             if (ref.current) {
-                const handler = handleResize(corner);
+                const handler = handleResize(handle);
                 ref.current.addEventListener('mousedown', handler as unknown as EventListener);
                 return () => ref.current?.removeEventListener('mousedown', handler as unknown as EventListener);
             }
             return () => { };
         };
 
-        const cleanupTopLeft = addResizeListener(topLeftRef, 'topLeft');
-        const cleanupTopRight = addResizeListener(topRightRef, 'topRight');
-        const cleanupBottomLeft = addResizeListener(bottomLeftRef, 'bottomLeft');
-        const cleanupBottomRight = addResizeListener(bottomRightRef, 'bottomRight');
+        const cleanupLeftHandle = addResizeListener(leftHandleRef, 'left');
+        const cleanupRightHandle = addResizeListener(rightHandleRef, 'right');
 
         return () => {
-            cleanupTopLeft();
-            cleanupTopRight();
-            cleanupBottomLeft();
-            cleanupBottomRight();
+            cleanupLeftHandle();
+            cleanupRightHandle();
         };
-    }, [width, height, aspectRatio, lockAspectRatio]);
+    }, [width, height, aspectRatio]);
 
     return (
         <div>
-            <div className="border rounded-md p-4 h-64 flex items-center justify-center bg-gray-50 overflow-hidden relative">
-                {imagePreviewUrl ? (
+            {image ? (
+                <div className="rounded-md p-2 max-w-full flex items-center justify-center overflow-hidden relative">
                     <div className={`flex justify-center w-full relative`}>
-                        <div className="relative inline-block" style={{ cursor: isDragging ? `${activeCorner}-resize` : 'default' }}>
+                        <div
+                            className="relative inline-block"
+                            style={{ cursor: isDragging ? `${activeHandle ? 'ew-resize' : 'default'}` : 'default' }}
+                            onMouseEnter={() => setIsHovering(true)}
+                            onMouseLeave={() => {
+                                if (!isDragging) setIsHovering(false);
+                            }}
+                        >
                             <img
                                 ref={imageRef}
-                                src={imagePreviewUrl}
+                                src={image.url}
                                 style={{ width: width ? `${width}px` : 'auto', height: height ? `${height}px` : 'auto' }}
-                                className="max-h-56 object-contain"
+                                className="max-w-full max-h-fit object-contain"
                             />
 
-                            {/* Top-left resize handle */}
+                            {/* Left resize handle - vertical bar */}
                             <div
-                                ref={topLeftRef}
-                                className="absolute w-6 h-6 bg-blue-500 bg-opacity-70 rounded-full -top-2 -left-2 cursor-nwse-resize hover:bg-opacity-90 flex items-center justify-center border-2 border-white shadow-md"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-white" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                                </svg>
-                            </div>
+                                ref={leftHandleRef}
+                                className={`absolute w-1.5 h-10 bg-neutral-800 rounded-4xl border-1 top-1/2 -translate-y-1/2 left-1 cursor-col-resize hover:bg-opacity-90 flex items-center justify-center border-white shadow-md transition-opacity duration-300 ease-in-out ${isHovering || isDragging ? 'opacity-100' : 'opacity-0'}`}
+                            ></div>
 
-                            {/* Top-right resize handle */}
+                            {/* Right resize handle - vertical bar */}
                             <div
-                                ref={topRightRef}
-                                className="absolute w-6 h-6 bg-blue-500 bg-opacity-70 rounded-full -top-2 -right-2 cursor-nesw-resize hover:bg-opacity-90 flex items-center justify-center border-2 border-white shadow-md"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-white" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                                </svg>
-                            </div>
-
-                            {/* Bottom-left resize handle */}
-                            <div
-                                ref={bottomLeftRef}
-                                className="absolute w-6 h-6 bg-blue-500 bg-opacity-70 rounded-full -bottom-2 -left-2 cursor-nesw-resize hover:bg-opacity-90 flex items-center justify-center border-2 border-white shadow-md"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-white" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                                </svg>
-                            </div>
-
-                            {/* Bottom-right resize handle */}
-                            <div
-                                ref={bottomRightRef}
-                                className="absolute w-6 h-6 bg-blue-500 bg-opacity-70 rounded-full -bottom-2 -right-2 cursor-nwse-resize hover:bg-opacity-90 flex items-center justify-center border-2 border-white shadow-md"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-white" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                                </svg>
-                            </div>
+                                ref={rightHandleRef}
+                                className={`absolute w-1.5 h-10 bg-neutral-800 rounded-4xl border-1 top-1/2 -translate-y-1/2 right-1 cursor-col-resize hover:bg-opacity-90 flex items-center justify-center border-white shadow-md transition-opacity duration-300 ease-in-out ${isHovering || isDragging ? 'opacity-100' : 'opacity-0'}`}
+                            ></div>
                         </div>
                     </div>
-                ) : (
-                    <div className="text-gray-400">Upload an image to preview</div>
-                )}
-            </div>
-            <p className="text-xs text-gray-500 mt-1">Drag the handle in the corner to resize the image</p>
+                </div>
+            ) : (
+                <div> </div>
+            )}
         </div>
     );
-};
+}
 
 export default ImageRender;

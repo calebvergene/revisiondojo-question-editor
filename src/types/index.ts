@@ -24,3 +24,12 @@ export type Question = {
     options: Option[];
     parts: Part[];
   };
+
+// image object
+export type Image = {
+    id: string;
+    url: string;
+    markdown: string;
+    width: number;
+    height: number;
+  };

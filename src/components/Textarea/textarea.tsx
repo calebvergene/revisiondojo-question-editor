@@ -2,20 +2,19 @@
 
 import { cn } from "@/lib/utils"
 import TextAreaToolbar from "./Toolbar"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import React from "react"
 import ImageRender from "./ImageRender"
+import { Image } from "@/types"
 
 interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   className?: string
-  setImages: React.Dispatch<React.SetStateAction<string[]>>
-  images: string[]
+  setImages?: React.Dispatch<React.SetStateAction<Image[]>>
+  images?: Image[]
 }
 
 function Textarea({ className, setImages, images, ...props }: TextareaProps) {
   const textareaRef = React.useRef<HTMLTextAreaElement>(null)
-  const [imagePreviewUrl, setImagePreviewUrl] = useState('');
-
 
   // this automatically adjusts height of the text box when it overflows
   useEffect(() => {
@@ -35,7 +34,18 @@ function Textarea({ className, setImages, images, ...props }: TextareaProps) {
       }
     }
   }, [])
-  
+
+  // function to update image markdown (when the user resizes)
+  const updateImage = (updatedImage: Image) => {
+    if (setImages) {
+      setImages(prevImages =>
+        prevImages.map(image =>
+          image.id === updatedImage.id ? updatedImage : image
+        )
+      );
+    }
+  };
+
 
   return (
     <div>
@@ -48,10 +58,21 @@ function Textarea({ className, setImages, images, ...props }: TextareaProps) {
         )}
         {...props}
       />
-      <TextAreaToolbar setImages={setImages} setImagePreviewUrl={setImagePreviewUrl} />
-      <ImageRender
-        imagePreviewUrl={imagePreviewUrl}
-      />
+      {setImages && images && (
+        <div>
+          <TextAreaToolbar setImages={setImages} />
+          {images.length > 0 && (
+            <div>
+              {images.map((image, index) => (
+                <ImageRender
+                  key={index}
+                  image={image}
+                  updateImage={updateImage}
+                />
+              ))}
+            </div>
+          )}
+        </div>)}
     </div>
   )
 }

@@ -10,12 +10,10 @@ interface Props {
   // eslint-disable-next-line
   updateOption: (id: number, field: keyof Option, value: any) => void
   option: Option
-  setImages: React.Dispatch<React.SetStateAction<string[]>>
-  images: string[]
 };
 
 
-const OptionSelection = ({ removeOption, updateOption, option, setImages, images }: Props) => {
+const OptionSelection = ({ removeOption, updateOption, option }: Props) => {
   return (
     <div className="px-3 py-3 rounded-2xl border border-dashed bg-neutral-50">
       <div className="flex items-center justify-between">
@@ -47,13 +45,13 @@ const OptionSelection = ({ removeOption, updateOption, option, setImages, images
         </div>
       </div>
       <div className="grid w-full gap-1.5 my-1.5 mb-0.5">
-        <Textarea className='!font-sans !bg-white' placeholder="Type your option content." value={option.content} onChange={(e) => updateOption(option.id, 'content', e.target.value)} setImages={setImages} images={images} id="content" />
+        <Textarea className='!font-sans !bg-white' placeholder="Type your option content." value={option.content} onChange={(e) => updateOption(option.id, 'content', e.target.value)} id="content" />
       </div>
       <div className="grid w-full gap-y-1.5 my-1.5 mb-0.5">
         <Label htmlFor="content" className="text-xs font-medium text-neutral-700 mt-2">
           Markscheme <span className='text-neutral-500 ml-1'>(optional)</span>
         </Label>
-        <Textarea className='!font-sans !bg-white' placeholder="Type your grading criteria." value={option.markscheme} onChange={(e) => updateOption(option.id, 'markscheme', e.target.value)} setImages={setImages} images={images} id="markscheme" />
+        <Textarea className='!font-sans !bg-white' placeholder="Type your grading criteria." value={option.markscheme} onChange={(e) => updateOption(option.id, 'markscheme', e.target.value)} id="markscheme" />
       </div>
     </div>
   )
