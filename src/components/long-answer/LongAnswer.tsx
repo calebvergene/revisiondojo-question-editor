@@ -10,7 +10,7 @@ interface Props {
     question: Question
 }
 
-const MCQ = ({ addPart, removePart, updatePart, question }: Props) => {
+const LongAnswer = ({ addPart, question }: Props) => {
     // prevent refresh
     const handleAddPart = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -49,4 +49,4 @@ const MCQ = ({ addPart, removePart, updatePart, question }: Props) => {
     );
 };
 
-export default MCQ
+export default LongAnswer

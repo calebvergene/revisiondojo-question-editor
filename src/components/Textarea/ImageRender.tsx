@@ -52,10 +52,7 @@ const ImageRender: React.FC<Props> = ({ image, updateImage }: Props) => {
 
             const startX = e.clientX;
             const startWidth = width;
-            const imageElement = imageRef.current;
-            const imageRect = imageElement?.getBoundingClientRect();
-            const imageLeft = imageRect ? imageRect.left : 0;
-
+            
             setIsDragging(true);
             setActiveHandle(handle);
 
@@ -127,6 +124,7 @@ const ImageRender: React.FC<Props> = ({ image, updateImage }: Props) => {
                         >
                             <img
                                 ref={imageRef}
+                                alt=''
                                 src={image.url}
                                 style={{ width: width ? `${width}px` : 'auto', height: height ? `${height}px` : 'auto' }}
                                 className="max-w-full max-h-fit object-contain"
