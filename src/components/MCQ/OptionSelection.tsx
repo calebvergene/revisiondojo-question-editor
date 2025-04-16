@@ -4,6 +4,13 @@ import { Trash2, GripVertical } from 'lucide-react'
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from '../ui/label'
 import { Textarea } from '../Textarea/textarea'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+
 
 interface Props {
   removeOption: (id: number) => void
@@ -35,7 +42,7 @@ const OptionSelection = ({ removeOption, updateOption, option, handleDragStart, 
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-x-3">
-          <button 
+          <button
             draggable
             onDragStart={onDragStart}
             onDragEnd={handleDragEnd}
@@ -58,12 +65,18 @@ const OptionSelection = ({ removeOption, updateOption, option, handleDragStart, 
           </div>
         </div>
         <div>
-          <button
-            onClick={() => removeOption(option.id)}
-            className="p-1 text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100 rounded-xl duration-200 cursor-pointer"
-          >
-            <Trash2 size={16} />
-          </button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger onClick={() => removeOption(option.id)}
+                className="p-1 text-neutral-500 hover:text-neutral-700 rounded-xl duration-200 cursor-pointer"
+              >
+                <Trash2 size={16} />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Delete</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </div>
       <div className="grid w-full gap-1.5 my-1.5 mb-0.5">

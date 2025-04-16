@@ -4,11 +4,12 @@ import React, { useEffect, useState, useRef } from 'react';
 interface Props {
     image: Image;
     updateImage: (updatedImage: Image) => void;
+    deleteImage?: (imageId: string) => void; // New prop for delete functionality
 }
 
 type Handle = 'left' | 'right' | null;
 
-const ImageRender: React.FC<Props> = ({ image, updateImage }: Props) => {
+const ImageRender: React.FC<Props> = ({ image, updateImage, deleteImage }: Props) => {
     const [width, setWidth] = useState<number>(300);
     const [height, setHeight] = useState<number>(300);
     const [isDragging, setIsDragging] = useState<boolean>(false);
@@ -109,6 +110,13 @@ const ImageRender: React.FC<Props> = ({ image, updateImage }: Props) => {
         };
     }, [width, height, aspectRatio]);
 
+    // handle image deletion
+    const handleDelete = () => {
+        if (deleteImage && image) {
+            deleteImage(image.id);
+        }
+    };
+
     return (
         <div>
             {image ? (
@@ -122,6 +130,15 @@ const ImageRender: React.FC<Props> = ({ image, updateImage }: Props) => {
                                 if (!isDragging) setIsHovering(false);
                             }}
                         >
+                            {/* Delete button */}
+                            <button
+                                onClick={handleDelete}
+                                className={`absolute top-1 right-1 bg-neutral-800/60 text-white rounded-md w-5 h-5 flex items-center justify-center z-10 shadow-md transition-opacity duration-300 ease-in-out ${isHovering || isDragging ? 'opacity-100' : 'opacity-0'}`}
+                                aria-label="Delete image"
+                            >
+                                ×
+                            </button>
+
                             <img
                                 ref={imageRef}
                                 alt=''

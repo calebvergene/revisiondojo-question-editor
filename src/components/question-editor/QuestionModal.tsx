@@ -30,6 +30,7 @@ interface Props {
 }
 
 const QuestionModal = ({ question, setQuestion }: Props) => {
+    const [open, setOpen] = useState(false);
     // will be a list of images in markdown
     const [specificationText, setSpecificationText] = useState<string>('');
     const [images, setImages] = useState<Image[]>([]);
@@ -164,10 +165,13 @@ const QuestionModal = ({ question, setQuestion }: Props) => {
         setDraggedItem(null);
     };
 
+    const deleteImage = (id: string) => {
+        setImages(images.filter((image) => image.id !== id));
+    }
 
-    // save question
+
+    // save question and close dialog
     const saveQuestion = () => {
-
         images.forEach((image) => {
             image.markdown = `<img src="${image.url}" alt="Visual reference for the question" width="${image.width}" height="${image.height}">`;
         })
@@ -187,16 +191,14 @@ const QuestionModal = ({ question, setQuestion }: Props) => {
 
         // this is just for testing purposes, i should do something now with this question. this is just to see the finished question
         setQuestion(newQuestion);
-
-        // would refresh question editor and then save the finished question.
-        //setSpecificationText('');
-        //setImages([]);
         console.log(newQuestion);
+        
+        setOpen(false);
     }
 
 
     return (
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger className="flex items-center space-x-1 px-3 py-1.5 font-bold bg-[#0084c7] text-white rounded-2xl hover:bg-[#0084c7]/90 duration-100 cursor-pointer">
                 <Plus size={16} />
                 <span>Create Question</span>
@@ -217,6 +219,7 @@ const QuestionModal = ({ question, setQuestion }: Props) => {
                                 images={images}
                                 className="!font-sans !min-h-20"
                                 setSpecificationText={setSpecificationText}
+                                deleteImage={deleteImage}
                             />
                         </div>
                         <Tabs defaultValue="mcq" className="mt-6">

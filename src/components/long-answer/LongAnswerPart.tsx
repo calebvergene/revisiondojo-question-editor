@@ -1,8 +1,20 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Part } from '@/types'
-import { Trash2, ChevronsUpDown, GripVertical } from 'lucide-react'
+import { Trash2, GripVertical } from 'lucide-react'
 import { Label } from '../ui/label'
 import { Textarea } from '../Textarea/textarea'
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip"
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover"
+
 
 interface Props {
     removePart: (id: number) => void
@@ -16,6 +28,10 @@ interface Props {
 
 
 const PartSelection = ({ removePart, updatePart, part, handleDragStart, handleDragOver, handleDragEnd }: Props) => {
+
+    // to close popover when clicking on buttons
+    const [open, setOpen] = useState(false);
+
 
     // so that the drag image of the whole component shows
     const partRef = React.useRef<HTMLDivElement>(null);
@@ -31,11 +47,11 @@ const PartSelection = ({ removePart, updatePart, part, handleDragStart, handleDr
     };
 
     return (
-        <div 
+        <div
             ref={partRef}
             className="px-3 py-3 rounded-2xl border border-dashed bg-neutral-50"
             onDragOver={(e) => handleDragOver(e, 'part', part.id)}
-            >
+        >
             <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                     <button
@@ -48,21 +64,42 @@ const PartSelection = ({ removePart, updatePart, part, handleDragStart, handleDr
                     </button>
                     <span className="font-semibold text-neutral-800">Part {part.order + 1}</span>
                     <div className="flex items-center space-x-1">
-                        <Label className="text-sm mr-2 ml-3 font-medium leading-none text-neutral-700 peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                        <Label className="text-sm mr-1 ml-3 font-medium leading-none text-neutral-700 peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                             Marks
                         </Label>
-                        <div>
-                            6
-                        </div>
+                        <Popover open={open} onOpenChange={setOpen}>
+                            <PopoverTrigger className='text-xs border px-2 py-0.5 rounded-sm hover:bg-neutral-100'>
+                                {part.marks}
+                            </PopoverTrigger>
+                            <PopoverContent side="top" className='!w-fit !p-0.5'>
+                                <div>
+                                    <button className='text-xs p-2 px-3 rounded-md hover:bg-neutral-100' onClick={() => {updatePart(part.id, "marks", 1); setOpen(false)}}>
+                                        1
+                                    </button>
+                                    <button className='text-xs p-2 px-3 rounded-md hover:bg-neutral-100' onClick={() => {updatePart(part.id, "marks", 2); setOpen(false)}}>
+                                        2
+                                    </button>
+                                    <button className='text-xs p-2 px-3 rounded-md hover:bg-neutral-100' onClick={() => {updatePart(part.id, "marks", 4); setOpen(false)}}>
+                                        4
+                                    </button>
+                                </div>
+                            </PopoverContent>
+                        </Popover>
                     </div>
                 </div>
                 <div>
-                    <button
-                        onClick={() => removePart(part.id)}
-                        className="p-1 text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100 rounded-xl duration-200 cursor-pointer"
-                    >
-                        <Trash2 size={16} />
-                    </button>
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger onClick={() => removePart(part.id)}
+                                className="p-1 text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100 rounded-xl duration-200 cursor-pointer"
+                            >
+                                <Trash2 size={16} />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>Delete</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
                 </div>
             </div>
             <div className="grid w-full gap-1.5 my-1.5 mb-0.5">
