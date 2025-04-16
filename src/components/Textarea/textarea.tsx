@@ -15,7 +15,7 @@ interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement
   deleteImage?: (id: string) => void
 }
 
-function Textarea({ className, setImages, images, setSpecificationText, deleteImage, ...props }: TextareaProps) {
+function Textarea({ className, setImages, images, deleteImage, ...props }: TextareaProps) {
   const textareaRef = React.useRef<HTMLTextAreaElement>(null)
 
   // this automatically adjusts height of the text box when it overflows
