@@ -1,6 +1,7 @@
 import React from 'react'
 import { Part, Question } from '@/types/index'
 import { Plus } from 'lucide-react'
+import LongAnswerPart from './LongAnswerPart'
 
 interface Props {
     addPart: () => void
@@ -8,9 +9,12 @@ interface Props {
     // eslint-disable-next-line
     updatePart: (id: number, field: keyof Part, value: any) => void
     question: Question
+    handleDragStart: (type: 'option' | 'part', id: number) => void
+    handleDragOver: (e: React.DragEvent, type: 'option' | 'part', id: number) => void
+    handleDragEnd: () => void
 }
 
-const LongAnswer = ({ addPart, question }: Props) => {
+const LongAnswer = ({ addPart, removePart, updatePart, question, handleDragStart, handleDragOver, handleDragEnd }: Props) => {
     // prevent refresh
     const handleAddPart = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -39,9 +43,15 @@ const LongAnswer = ({ addPart, question }: Props) => {
             ) : (
                 <div className="space-y-4 mt-3 mb-1.5">
                     {question.parts.map((part) => (
-                        <div key={part.id}>
-                            {part.id}
-                        </div>
+                        <LongAnswerPart
+                            key={part.id}
+                            removePart={removePart}
+                            updatePart={updatePart}
+                            part={part}
+                            handleDragStart={handleDragStart} 
+                            handleDragOver={handleDragOver} 
+                            handleDragEnd={handleDragEnd}
+                        />
                     ))}
                 </div>
             )}

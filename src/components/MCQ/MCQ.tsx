@@ -9,9 +9,12 @@ interface Props {
     // eslint-disable-next-line
     updateOption: (id: number, field: keyof Option, value: any) => void
     question: Question
+    handleDragStart: (type: 'option' | 'part', id: number) => void
+    handleDragOver: (e: React.DragEvent, type: 'option' | 'part', id: number) => void
+    handleDragEnd: () => void
 }
 
-const MCQ = ({ addOption, removeOption, updateOption, question}: Props) => {
+const MCQ = ({ addOption, removeOption, updateOption, question, handleDragStart, handleDragOver, handleDragEnd}: Props) => {
     // prevent refresh
     const handleAddOption = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -45,6 +48,9 @@ const MCQ = ({ addOption, removeOption, updateOption, question}: Props) => {
                             removeOption={removeOption}
                             updateOption={updateOption}
                             option={option}
+                            handleDragStart={handleDragStart} 
+                            handleDragOver={handleDragOver} 
+                            handleDragEnd={handleDragEnd}
                         />
                     ))}
                 </div>

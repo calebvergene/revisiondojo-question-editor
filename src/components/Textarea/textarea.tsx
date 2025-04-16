@@ -11,9 +11,10 @@ interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement
   className?: string
   setImages?: React.Dispatch<React.SetStateAction<Image[]>>
   images?: Image[]
+  setSpecificationText?: React.Dispatch<React.SetStateAction<string>>
 }
 
-function Textarea({ className, setImages, images, ...props }: TextareaProps) {
+function Textarea({ className, setImages, images, setSpecificationText, ...props }: TextareaProps) {
   const textareaRef = React.useRef<HTMLTextAreaElement>(null)
 
   // this automatically adjusts height of the text box when it overflows
@@ -60,7 +61,9 @@ function Textarea({ className, setImages, images, ...props }: TextareaProps) {
       />
       {setImages && images && (
         <div>
-          <TextAreaToolbar setImages={setImages} />
+          <div className="flex justify-end">
+            <TextAreaToolbar setImages={setImages} />
+          </div>
           {images.length > 0 && (
             <div>
               {images.map((image, index) => (

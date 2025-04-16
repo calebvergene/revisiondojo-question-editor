@@ -1,6 +1,6 @@
 import React from 'react'
 import { Option } from '@/types'
-import { Trash2, ChevronsUpDown } from 'lucide-react'
+import { Trash2, GripVertical } from 'lucide-react'
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from '../ui/label'
 import { Textarea } from '../Textarea/textarea'
@@ -10,16 +10,41 @@ interface Props {
   // eslint-disable-next-line
   updateOption: (id: number, field: keyof Option, value: any) => void
   option: Option
+  handleDragStart: (type: 'option' | 'part', id: number) => void
+  handleDragOver: (e: React.DragEvent, type: 'option' | 'part', id: number) => void
+  handleDragEnd: () => void
 };
 
 
-const OptionSelection = ({ removeOption, updateOption, option }: Props) => {
+const OptionSelection = ({ removeOption, updateOption, option, handleDragStart, handleDragOver, handleDragEnd }: Props) => {
+
+  // so that the drag image of the whole component shows
+  const optionRef = React.useRef<HTMLDivElement>(null);
+  const onDragStart = (e: React.DragEvent) => {
+    if (optionRef.current) {
+      e.dataTransfer.setDragImage(optionRef.current, 0, 0);
+    }
+    handleDragStart('option', option.id);
+  };
+
   return (
-    <div className="px-3 py-3 rounded-2xl border border-dashed bg-neutral-50">
+    <div
+      ref={optionRef}
+      className="px-3 py-3 rounded-2xl border border-dashed bg-neutral-50"
+      onDragOver={(e) => handleDragOver(e, 'option', option.id)}
+    >
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <span className="font-semibold text-neutral-700">Option {option.order + 1}</span>
-          <div className="flex items-center space-x-1">
+        <div className="flex items-center gap-x-3">
+          <button 
+            draggable
+            onDragStart={onDragStart}
+            onDragEnd={handleDragEnd}
+            className='cursor-move'
+          >
+            <GripVertical size={16} />
+          </button>
+          <span className="font-semibold text-neutral-800">Option {option.order + 1}</span>
+          <div className="flex items-center space-x-1 ml-1">
             <Checkbox id="Correct" checked={option.correct} onCheckedChange={() => updateOption(option.id, 'correct', Boolean(!option.correct))}
             />
             <div className="grid gap-1.5 leading-none">
@@ -38,9 +63,6 @@ const OptionSelection = ({ removeOption, updateOption, option }: Props) => {
             className="p-1 text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100 rounded-xl duration-200 cursor-pointer"
           >
             <Trash2 size={16} />
-          </button>
-          <button className='p-1 text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100 rounded-xl duration-200 cursor-move'>
-            <ChevronsUpDown size={16} />
           </button>
         </div>
       </div>

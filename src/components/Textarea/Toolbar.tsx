@@ -1,7 +1,11 @@
 "use client"
 import { Image } from '@/types';
 import { Bold, ImagePlus, Italic, Underline } from 'lucide-react';
-import React, { ChangeEvent } from 'react'
+import React, { ChangeEvent } from 'react' 
+import {
+  ToggleGroup,
+  ToggleGroupItem,
+} from "@/components/ui/toggle-group"
 
 interface Props {
   setImages: React.Dispatch<React.SetStateAction<Image[]>>;
@@ -30,26 +34,28 @@ const TextAreaToolbar = ({ setImages }: Props) => {
   };
 
   return (
-    <div className='mt-0.5'>
+    <div className='my-1 flex row gap-x-0.5'>
+      <ToggleGroup type="single" size="sm" className='gap-x-0.5'>
+      <ToggleGroupItem value="bold" aria-label="Toggle bold" className='!rounded-sm'>
+        <Bold className="h-3 w-3" />
+      </ToggleGroupItem>
+      <ToggleGroupItem value="italic" aria-label="Toggle italic" className='!rounded-sm'>
+        <Italic className="h-3 w-3" />
+      </ToggleGroupItem>
+      <ToggleGroupItem value="strikethrough" aria-label="Toggle strikethrough" className='!rounded-sm'>
+        <Underline className="h-3 w-3" />
+      </ToggleGroupItem>
+    </ToggleGroup>
       <label htmlFor="image-upload" className="inline-block">
-        <ImagePlus className="size-7 stroke-2.5 p-1.5 text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100 rounded-md duration-200 cursor-pointer" />
-        <input 
+        <ImagePlus className="size-8 stroke-2.5 p-2 text-neutral-800 hover:text-neutral-500 hover:bg-neutral-100 rounded-sm duration-100 cursor-pointer" />
+        <input
           id="image-upload"
-          type="file" 
-          accept="image/*" 
-          onChange={handleImageChange} 
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
           className="hidden"
         />
       </label>
-      <button>
-        <Bold className="size-7 stroke-3 p-1.5 text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100 rounded-md duration-200 cursor-pointer" />
-      </button>
-      <button>
-        <Italic className="size-7 stroke-3 p-1.5 text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100 rounded-md duration-200 cursor-pointer" />
-      </button>
-      <button>
-        <Underline className="size-6.5 mb-[0.5px] stroke-3 p-1 text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100 rounded-md duration-200 cursor-pointer" />
-      </button>
     </div>
   )
 }

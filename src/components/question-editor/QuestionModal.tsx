@@ -33,6 +33,7 @@ const QuestionModal = ({ question, setQuestion }: Props) => {
     // will be a list of images in markdown
     const [specificationText, setSpecificationText] = useState<string>('');
     const [images, setImages] = useState<Image[]>([]);
+    const [draggedItem, setDraggedItem] = useState<{ type: 'option' | 'part', id: number } | null>(null);
 
     // generates IDs for options and parts
     const generateId = (): number => Math.floor(Math.random() * 100000);
@@ -119,6 +120,51 @@ const QuestionModal = ({ question, setQuestion }: Props) => {
     };
 
 
+    // handle drag and drop
+    const handleDragStart = (type: 'option' | 'part', id: number) => {
+        setDraggedItem({ type, id });
+    };
+    const handleDragOver = (e: React.DragEvent, type: 'option' | 'part', id: number) => {
+        e.preventDefault();
+
+        if (!draggedItem || draggedItem.type !== type) return;
+
+        const items = type === 'option' ? question.options : question.parts;
+        const draggedIndex = items.findIndex(item => item.id === draggedItem.id);
+        const hoverIndex = items.findIndex(item => item.id === id);
+
+        if (draggedIndex === hoverIndex) return;
+
+        const newItems = [...items];
+        const draggedItemContent = newItems[draggedIndex];
+
+        newItems.splice(draggedIndex, 1);
+        newItems.splice(hoverIndex, 0, draggedItemContent);
+
+        newItems.forEach((item, idx) => {
+            item.order = idx;
+        });
+
+        if (type === 'option') {
+            const options = newItems.filter(item => item.hasOwnProperty('correct')) as Option[];
+            setQuestion({
+                ...question,
+                options
+            });
+        } else {
+            const parts = newItems.filter(item => item.hasOwnProperty('content')) as Part[];
+            setQuestion({
+                ...question,
+                parts
+            });
+        }
+    };
+
+    const handleDragEnd = () => {
+        setDraggedItem(null);
+    };
+
+
     // save question
     const saveQuestion = () => {
 
@@ -170,6 +216,7 @@ const QuestionModal = ({ question, setQuestion }: Props) => {
                                 setImages={setImages}
                                 images={images}
                                 className="!font-sans !min-h-20"
+                                setSpecificationText={setSpecificationText}
                             />
                         </div>
                         <Tabs defaultValue="mcq" className="mt-6">
@@ -177,8 +224,8 @@ const QuestionModal = ({ question, setQuestion }: Props) => {
                                 <TabsTrigger value="mcq" className="!font-bold"><CheckSquare /> MCQ</TabsTrigger>
                                 <TabsTrigger value="long answer" className="!font-bold"><AlignLeft /> Long Answer</TabsTrigger>
                             </TabsList>
-                            <TabsContent value="mcq" ><MCQ addOption={addOption} updateOption={updateOption} removeOption={removeOption} question={question} /></TabsContent>
-                            <TabsContent value="long answer"><LongAnswer addPart={addPart} updatePart={updatePart} removePart={removePart} question={question} /></TabsContent>
+                            <TabsContent value="mcq" ><MCQ addOption={addOption} updateOption={updateOption} removeOption={removeOption} question={question} handleDragStart={handleDragStart} handleDragOver={handleDragOver} handleDragEnd={handleDragEnd}/></TabsContent>
+                            <TabsContent value="long answer"><LongAnswer addPart={addPart} updatePart={updatePart} removePart={removePart} question={question} handleDragStart={handleDragStart} handleDragOver={handleDragOver} handleDragEnd={handleDragEnd}/></TabsContent>
                         </Tabs>
                     </div>
                     <div className="w-full flex justify-end">

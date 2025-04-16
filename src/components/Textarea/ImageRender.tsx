@@ -112,11 +112,11 @@ const ImageRender: React.FC<Props> = ({ image, updateImage }: Props) => {
     return (
         <div>
             {image ? (
-                <div className="rounded-md p-2 max-w-full flex items-center justify-center overflow-hidden relative">
+                <div className="rounded-md max-w-full flex items-center justify-center overflow-hidden relative">
                     <div className={`flex justify-center w-full relative`}>
                         <div
                             className="relative inline-block"
-                            style={{ cursor: isDragging ? `${activeHandle ? 'ew-resize' : 'default'}` : 'default' }}
+                            style={{ cursor: isDragging ? `${activeHandle ? 'col-resize' : 'default'}` : 'default' }}
                             onMouseEnter={() => setIsHovering(true)}
                             onMouseLeave={() => {
                                 if (!isDragging) setIsHovering(false);
@@ -127,7 +127,7 @@ const ImageRender: React.FC<Props> = ({ image, updateImage }: Props) => {
                                 alt=''
                                 src={image.url}
                                 style={{ width: width ? `${width}px` : 'auto', height: height ? `${height}px` : 'auto' }}
-                                className="max-w-full max-h-fit object-contain"
+                                className="max-w-full max-h-fit object-contain rounded-lg"
                             />
 
                             {/* Left resize handle - vertical bar */}
